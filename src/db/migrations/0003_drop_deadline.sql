@@ -1,0 +1,1 @@
+ALTER TABLE `goals` DROP COLUMN `deadline_at`;

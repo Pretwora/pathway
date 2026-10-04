@@ -1,0 +1,9 @@
+{
+  "name": "pathway-logo-anim",
+  "private": true,
+  "description": "Генератор геометрии логотипа для анимированной заставки (см. prepare.py, trace.mjs)",
+  "type": "module",
+  "dependencies": {
+    "potrace": "2.1.8"
+  }
+}

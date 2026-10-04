@@ -1,0 +1,72 @@
+{
+  "expo": {
+    "name": "Pathway",
+    "slug": "pathway",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "icon": "./assets/images/icon.png",
+    "scheme": "pathway",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#0A0F1A",
+    "ios": {
+      "bundleIdentifier": "com.sgrigoriev.pathway",
+      "supportsTablet": false
+    },
+    "android": {
+      "package": "com.sgrigoriev.pathway",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "backgroundColor": "#1A8CF2",
+        "backgroundImage": "./assets/images/adaptive-background.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "monochromeImage": "./assets/images/adaptive-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#0A0F1A",
+          "image": "./assets/images/splash-blank.png",
+          "imageWidth": 160
+        }
+      ],
+      "expo-sqlite",
+      [
+        "expo-font",
+        {
+          "fonts": [
+            "node_modules/@expo-google-fonts/manrope/400Regular/Manrope_400Regular.ttf",
+            "node_modules/@expo-google-fonts/manrope/500Medium/Manrope_500Medium.ttf",
+            "node_modules/@expo-google-fonts/manrope/600SemiBold/Manrope_600SemiBold.ttf",
+            "node_modules/@expo-google-fonts/manrope/700Bold/Manrope_700Bold.ttf",
+            "node_modules/@expo-google-fonts/unbounded/500Medium/Unbounded_500Medium.ttf"
+          ]
+        }
+      ],
+      "expo-sharing",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false,
+          "enableBackgroundRecording": false
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {}
+    }
+  }
+}
