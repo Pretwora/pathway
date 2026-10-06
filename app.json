@@ -14,7 +14,7 @@
     "backgroundColor": "#0A0F1A",
     "ios": {
       "bundleIdentifier": "com.sgrigoriev.pathway",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "supportsTablet": false,
       "config": {
         "usesNonExemptEncryption": false
