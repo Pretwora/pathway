@@ -1,5 +1,6 @@
 import { setAudioModeAsync, useAudioPlayer } from 'expo-audio';
 import { useEffect } from 'react';
+import { Platform } from 'react-native';
 
 const completeSound = require('@/assets/sounds/complete.m4a');
 
@@ -21,16 +22,24 @@ export function useCompletionSound() {
     let cancelled = false;
 
     void (async () => {
-      await setAudioModeAsync({
-        // Умолчание модуля — играть всегда. Нам наоборот: беззвучный режим и
-        // вибро на Android, переключатель на торце на iOS должны глушить звук.
-        playsInSilentMode: false,
-        // Не mixWithOthers: на тренировке часто в наушниках, и фанфара поверх музыки
-        // в полную громкость — каша. Чужой звук приглушится на четыре секунды
-        // и вернётся сам.
-        interruptionMode: 'duckOthers',
-        shouldPlayInBackground: false,
-      });
+      try {
+        await setAudioModeAsync({
+          // Умолчание модуля — играть всегда. Нам наоборот: беззвучный режим и
+          // вибро на Android, переключатель на торце на iOS должны глушить звук.
+          playsInSilentMode: false,
+          // Где можно — duckOthers: на тренировке часто в наушниках, и фанфара
+          // поверх музыки в полную громкость — каша. Чужой звук приглушится на
+          // четыре секунды и вернётся сам. На iOS так нельзя: переключатель
+          // слушает только категория Ambient, а она приглушать не умеет —
+          // модуль отвергает такую пару. Беззвучный режим важнее, там смешиваем.
+          interruptionMode: Platform.OS === 'ios' ? 'mixWithOthers' : 'duckOthers',
+          shouldPlayInBackground: false,
+        });
+      } catch {
+        // Не удалось выставить режим — молчим: играть с умолчанием модуля
+        // значит звенеть и в беззвучном режиме.
+        return;
+      }
       // Режим ставится асинхронно — за это время экран могли уже закрыть.
       if (cancelled) return;
       player.play();
