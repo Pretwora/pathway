@@ -7,6 +7,7 @@ import { useDays, useGoal, useHasActiveGoal } from '@/data/hooks';
 import { daysSpent, formatDay, formatDaysSpent } from '@/domain/day';
 import { isClosedEarly, overshoot, progressFraction, sumAmounts } from '@/domain/progress';
 import { ShareSheet } from '@/features/share/ShareSheet';
+import { useLang, useT } from '@/i18n';
 import { useGoalActions } from '@/store/useGoalActions';
 import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
@@ -22,6 +23,8 @@ export default function ArchivedGoalScreen() {
   const { hasActive } = useHasActiveGoal();
   const { repeatGoal, resumeGoal, deleteGoal } = useGoalActions();
   const [sharing, setSharing] = useState(false);
+  const t = useT();
+  const lang = useLang();
 
   if (loading) return <View style={styles.screen} />;
   if (!goal) {
@@ -42,7 +45,7 @@ export default function ArchivedGoalScreen() {
   function onRepeat() {
     if (!goal) return;
     if (hasActive) {
-      Alert.alert('Есть активная цель', 'Сначала закрой текущую — активной может быть только одна.');
+      Alert.alert(t.archivedGoal.activeExistsTitle, t.archivedGoal.activeExistsBody);
       return;
     }
     // После повтора уводим на дом (там уже новая активная цель → счётчик).
@@ -56,7 +59,7 @@ export default function ArchivedGoalScreen() {
   function onResume() {
     if (!goal) return;
     if (hasActive) {
-      Alert.alert('Есть активная цель', 'Сначала закрой текущую — активной может быть только одна.');
+      Alert.alert(t.archivedGoal.activeExistsTitle, t.archivedGoal.activeExistsBody);
       return;
     }
     void resumeGoal(goal.id).then(() => {
@@ -67,10 +70,10 @@ export default function ArchivedGoalScreen() {
 
   function onDelete() {
     if (!goal) return;
-    Alert.alert('Удалить цель?', 'Вместе с ней исчезнет вся история. Отменить нельзя.', [
-      { text: 'Отмена', style: 'cancel' },
+    Alert.alert(t.archivedGoal.deleteTitle, t.archivedGoal.deleteBody, [
+      { text: t.common.cancel, style: 'cancel' },
       {
-        text: 'Удалить',
+        text: t.common.delete,
         style: 'destructive',
         onPress: () => void deleteGoal(goal.id).then(() => goBack()),
       },
@@ -82,22 +85,22 @@ export default function ArchivedGoalScreen() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
-        <IconButton icon="back" label="Назад" onPress={goBack} />
+        <IconButton icon="back" label={t.common.back} onPress={goBack} />
       </View>
 
       <ScrollView contentContainerStyle={styles.body}>
-        <Text style={styles.kicker}>{canResume ? 'Цель закрыта досрочно' : 'Цель достигнута'}</Text>
+        <Text style={styles.kicker}>{canResume ? t.archivedGoal.closedEarly : t.common.goalReached}</Text>
         <Text style={styles.number} numberOfLines={1} adjustsFontSizeToFit>
           {total}
         </Text>
         <Text style={styles.title}>{goal.title}</Text>
         <View style={styles.metaRow}>
-          {spent ? <Text style={styles.meta}>{formatDaysSpent(spent)}</Text> : null}
-          {extra > 0 ? <Text style={styles.metaExtra}>перевыполнено на {extra}</Text> : null}
+          {spent ? <Text style={styles.meta}>{formatDaysSpent(spent, lang)}</Text> : null}
+          {extra > 0 ? <Text style={styles.metaExtra}>{t.common.overBy(extra)}</Text> : null}
           {/* Без этой строки закрытое досрочно неотличимо от добитого,
               и кнопка «Продолжить» появлялась бы без объяснения. */}
           {canResume ? (
-            <Text style={styles.meta}>завершено досрочно, цель — {goal.target}</Text>
+            <Text style={styles.meta}>{t.archivedGoal.finishedEarly(goal.target)}</Text>
           ) : null}
         </View>
 
@@ -114,7 +117,7 @@ export default function ArchivedGoalScreen() {
           <View style={styles.history}>
             {days.map((entry) => (
               <View key={entry.id} style={styles.dayRow}>
-                <Text style={styles.dayLabel}>{formatDay(entry.day)}</Text>
+                <Text style={styles.dayLabel}>{formatDay(entry.day, lang)}</Text>
                 <Text style={styles.dayAmount}>{entry.amount}</Text>
               </View>
             ))}
@@ -128,14 +131,14 @@ export default function ArchivedGoalScreen() {
             кнопка тише: они звучат похоже, а делают разное. */}
         {canResume ? (
           <>
-            <Button title="Продолжить" onPress={onResume} />
-            <Button title="Начать заново" variant="ghost" onPress={onRepeat} />
+            <Button title={t.archivedGoal.resume} onPress={onResume} />
+            <Button title={t.archivedGoal.startOver} variant="ghost" onPress={onRepeat} />
           </>
         ) : (
-          <Button title="Повторить заново" onPress={onRepeat} />
+          <Button title={t.archivedGoal.repeat} onPress={onRepeat} />
         )}
-        <Button title="Поделиться" variant="ghost" onPress={() => setSharing(true)} />
-        <Button title="Удалить" variant="ghost" onPress={onDelete} />
+        <Button title={t.common.share} variant="ghost" onPress={() => setSharing(true)} />
+        <Button title={t.common.delete} variant="ghost" onPress={onDelete} />
       </View>
 
       {sharing ? (

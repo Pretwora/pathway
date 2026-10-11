@@ -12,12 +12,31 @@
     "scheme": "pathway",
     "userInterfaceStyle": "dark",
     "backgroundColor": "#0A0F1A",
+    "locales": {
+      "ru": {
+        "ios": {
+          "CFBundleDisplayName": "Pathway"
+        }
+      },
+      "en": {
+        "ios": {
+          "CFBundleDisplayName": "Pathway"
+        }
+      }
+    },
     "ios": {
       "bundleIdentifier": "com.sgrigoriev.pathway",
-      "buildNumber": "2",
+      "buildNumber": "3",
       "supportsTablet": false,
       "config": {
         "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "CFBundleAllowMixedLocalizations": true,
+        "CFBundleLocalizations": [
+          "en",
+          "ru"
+        ]
       }
     },
     "android": {

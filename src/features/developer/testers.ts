@@ -10,6 +10,3 @@ export const TESTERS: string[] = [];
 
 /** Куда писать, чтобы попасть в тестировщики. Он же контакт разработчика. */
 export const CONTACT_EMAIL = 'pretwora@gmail.com';
-
-/** Кто сделал. Показывается на экране «Разработчик». */
-export const AUTHOR = 'Сергей Григорьев';

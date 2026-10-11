@@ -1,4 +1,14 @@
-import { parseBackup } from './backup';
+import { BackupError, parseBackup, type BackupErrorCode } from './backup';
+
+/** Код причины, с которой копия отвергнута. */
+function rejection(raw: unknown): BackupErrorCode | 'accepted' | 'other' {
+  try {
+    parseBackup(raw);
+    return 'accepted';
+  } catch (e) {
+    return e instanceof BackupError ? e.code : 'other';
+  }
+}
 
 const goal = {
   id: 'g1',
@@ -43,39 +53,40 @@ describe('parseBackup', () => {
   });
 
   it('не наш файл — отвергается', () => {
-    expect(() => parseBackup({ foo: 'bar' })).toThrow(/не файл копии/i);
+    expect(rejection({ foo: 'bar' })).toBe('notBackup');
   });
 
   it('чужой app — отвергается', () => {
-    expect(() => parseBackup({ ...valid(), app: 'other' })).toThrow(/не файл копии/i);
+    expect(rejection({ ...valid(), app: 'other' })).toBe('notBackup');
   });
 
-  it('версия новее поддерживаемой — отвергается с советом обновиться', () => {
-    expect(() => parseBackup({ ...valid(), version: 99 })).toThrow(/обнови/i);
+  it('версия новее поддерживаемой — отвергается как более новая', () => {
+    expect(rejection({ ...valid(), version: 99 })).toBe('newerVersion');
   });
 
   it('не JSON-объект — отвергается', () => {
-    expect(() => parseBackup('строка')).toThrow();
-    expect(() => parseBackup(null)).toThrow();
+    expect(rejection('строка')).toBe('notBackup');
+    expect(rejection(null)).toBe('notBackup');
   });
 
   it('goals не массив — отвергается', () => {
-    expect(() => parseBackup({ ...valid(), goals: 'нет' })).toThrow(/повреждён/i);
+    expect(rejection({ ...valid(), goals: 'нет' })).toBe('corrupted');
   });
 
   it('испорченное поле цели — отвергается', () => {
     const bad = { ...valid(), goals: [{ ...goal, target: 'много' }] };
-    expect(() => parseBackup(bad)).toThrow(/target/i);
+    expect(rejection(bad)).toBe('corrupted');
+    expect(() => parseBackup(bad)).toThrow(/target/);
   });
 
   it('неизвестный статус цели — отвергается', () => {
     const bad = { ...valid(), goals: [{ ...goal, status: 'paused' }] };
-    expect(() => parseBackup(bad)).toThrow(/статус/i);
+    expect(rejection(bad)).toBe('corrupted');
   });
 
   it('две активные цели — отвергается', () => {
     const bad = { ...valid(), goals: [goal, { ...goal, id: 'g2' }] };
-    expect(() => parseBackup(bad)).toThrow(/активн/i);
+    expect(rejection(bad)).toBe('twoActive');
   });
 
   it('активное + архивное — норма', () => {

@@ -12,6 +12,7 @@ import * as Sharing from 'expo-sharing';
 
 import { exportAll, replaceAll } from '@/data/goals-repo';
 import { parseBackup, type BackupData } from '@/domain/backup';
+import { getT } from '@/i18n';
 
 /** Версия формата — чтобы будущий импорт мог понять, что читает. */
 const BACKUP_VERSION = 1;
@@ -40,15 +41,16 @@ export async function exportBackup(now = Date.now()): Promise<boolean> {
   if (!(await Sharing.isAvailableAsync())) return false;
   await Sharing.shareAsync(file.uri, {
     mimeType: 'application/json',
-    dialogTitle: 'Сохранить копию данных',
+    dialogTitle: getT().settings.exportDialogTitle,
   });
   return true;
 }
 
 /**
  * Даёт выбрать файл копии и разбирает его. Возвращает данные (или null, если
- * пользователь передумал выбирать). Бросает Error с русским текстом, если файл
- * не подходит. Саму замену данных здесь НЕ делает — сначала спросим подтверждение.
+ * пользователь передумал выбирать). Бросает BackupError (или SyntaxError, если
+ * это вообще не JSON), когда файл не подходит. Саму замену данных здесь НЕ
+ * делает — сначала спросим подтверждение.
  */
 export async function pickBackup(): Promise<BackupData | null> {
   const result = await DocumentPicker.getDocumentAsync({

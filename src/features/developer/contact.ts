@@ -12,6 +12,7 @@ import Constants from 'expo-constants';
 import * as Clipboard from 'expo-clipboard';
 import { Alert, Linking, Platform } from 'react-native';
 
+import { getT } from '@/i18n';
 import { CONTACT_EMAIL } from './testers';
 
 /**
@@ -36,9 +37,7 @@ export async function writeToDeveloper(): Promise<void> {
     return;
   } catch {
     await Clipboard.setStringAsync(CONTACT_EMAIL);
-    Alert.alert(
-      'Почта не открылась',
-      `Адрес скопирован: ${CONTACT_EMAIL}\n\nВставь его в любой почтовый клиент или мессенджер.`,
-    );
+    const t = getT();
+    Alert.alert(t.developer.mailFailedTitle, t.developer.mailFailedBody(CONTACT_EMAIL));
   }
 }

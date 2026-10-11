@@ -3,6 +3,7 @@ import { router } from 'expo-router';
 import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { useT } from '@/i18n';
 import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
 import { Trail } from '@/ui/components/Trail';
@@ -19,6 +20,7 @@ const logo = require('@/assets/images/card-logo.png');
  */
 export function IdleHome() {
   const { width } = useWindowDimensions();
+  const t = useT();
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
@@ -28,8 +30,8 @@ export function IdleHome() {
           <Text style={styles.wordmark}>pathway</Text>
         </View>
         <View style={styles.topNav}>
-          <IconButton icon="archive" label="Архив" onPress={() => router.push('/archive')} />
-          <IconButton icon="settings" label="Настройки" onPress={() => router.push('/settings')} />
+          <IconButton icon="archive" label={t.common.archive} onPress={() => router.push('/archive')} />
+          <IconButton icon="settings" label={t.common.settings} onPress={() => router.push('/settings')} />
         </View>
       </View>
 
@@ -39,23 +41,20 @@ export function IdleHome() {
         <View style={styles.trailBlock}>
           <Trail fraction={0} width={width - layout.screenPadding * 2} animateIn={false} />
           <View style={styles.trailLabels}>
-            <Text style={styles.trailLabel}>Ты здесь</Text>
-            <Text style={styles.trailLabel}>Цель</Text>
+            <Text style={styles.trailLabel}>{t.home.youAreHere}</Text>
+            <Text style={styles.trailLabel}>{t.home.goal}</Text>
           </View>
         </View>
 
         <View style={styles.intro}>
-          <Text style={styles.heading}>Большое складывается из малого</Text>
-          <Text style={styles.phrase}>
-            Поставь цель — число, к которому идёшь понемногу: подходы, страницы, километры, минуты. Дальше
-            просто прибавляй сделанное.
-          </Text>
+          <Text style={styles.heading}>{t.home.heading}</Text>
+          <Text style={styles.phrase}>{t.home.phrase}</Text>
         </View>
       </ScrollView>
 
       <View style={styles.actions}>
-        <Button title="Новая цель" icon="plus" onPress={() => router.push('/goal/new')} />
-        <Text style={styles.note}>Одна цель за раз — так до неё проще дойти.</Text>
+        <Button title={t.home.newGoal} icon="plus" onPress={() => router.push('/goal/new')} />
+        <Text style={styles.note}>{t.home.note}</Text>
       </View>
     </SafeAreaView>
   );

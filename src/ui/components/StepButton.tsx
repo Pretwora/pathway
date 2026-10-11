@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 
+import { useT } from '@/i18n';
 import { colors, layout, motion, radius, text } from '@/ui/tokens';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -23,6 +24,7 @@ type Props = {
  */
 export function StepButton({ step, onPress }: Props) {
   const scale = useSharedValue(1);
+  const t = useT();
 
   const animated = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
 
@@ -35,7 +37,7 @@ export function StepButton({ step, onPress }: Props) {
       // случайное касание при доставании телефона добавит лишнего.
       onPress={onPress}
       accessibilityRole="button"
-      accessibilityLabel={`Добавить ${step}`}
+      accessibilityLabel={t.counter.stepA11y(step)}
     >
       <Text style={styles.label} maxFontSizeMultiplier={1.3} numberOfLines={1} adjustsFontSizeToFit>
         <Text style={styles.plus}>+</Text>

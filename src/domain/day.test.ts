@@ -29,15 +29,21 @@ describe('dayKey', () => {
 
 describe('formatDay', () => {
   it('склоняет месяц', () => {
-    expect(formatDay('2026-07-17')).toBe('17 июля');
+    expect(formatDay('2026-07-17', 'ru')).toBe('17 июля');
   });
 
   it('убирает ведущий ноль из дня', () => {
-    expect(formatDay('2026-01-05')).toBe('5 января');
+    expect(formatDay('2026-01-05', 'ru')).toBe('5 января');
   });
 
   it('декабрь — последний месяц таблицы, не выходит за границы', () => {
-    expect(formatDay('2026-12-31')).toBe('31 декабря');
+    expect(formatDay('2026-12-31', 'ru')).toBe('31 декабря');
+  });
+
+  it('по-английски: сокращённый месяц и число после него', () => {
+    expect(formatDay('2026-07-17', 'en')).toBe('Jul 17');
+    expect(formatDay('2026-01-05', 'en')).toBe('Jan 5');
+    expect(formatDay('2026-12-31', 'en')).toBe('Dec 31');
   });
 });
 
@@ -75,37 +81,44 @@ describe('daysSpent', () => {
 
 describe('formatDaysSpent', () => {
   it('склоняет единицу', () => {
-    expect(formatDaysSpent(1)).toBe('за 1 день');
+    expect(formatDaysSpent(1, 'ru')).toBe('за 1 день');
   });
 
   it('склоняет 2–4', () => {
-    expect(formatDaysSpent(3)).toBe('за 3 дня');
+    expect(formatDaysSpent(3, 'ru')).toBe('за 3 дня');
   });
 
   it('склоняет 5 и дальше', () => {
-    expect(formatDaysSpent(7)).toBe('за 7 дней');
+    expect(formatDaysSpent(7, 'ru')).toBe('за 7 дней');
   });
 
   it('11–14 — исключение русского языка', () => {
-    expect(formatDaysSpent(11)).toBe('за 11 дней');
-    expect(formatDaysSpent(12)).toBe('за 12 дней');
-    expect(formatDaysSpent(14)).toBe('за 14 дней');
+    expect(formatDaysSpent(11, 'ru')).toBe('за 11 дней');
+    expect(formatDaysSpent(12, 'ru')).toBe('за 12 дней');
+    expect(formatDaysSpent(14, 'ru')).toBe('за 14 дней');
   });
 
   it('21 — снова «день», а не «дней»', () => {
-    expect(formatDaysSpent(21)).toBe('за 21 день');
+    expect(formatDaysSpent(21, 'ru')).toBe('за 21 день');
   });
 
   it('22–24 — «дня»', () => {
-    expect(formatDaysSpent(24)).toBe('за 24 дня');
+    expect(formatDaysSpent(24, 'ru')).toBe('за 24 дня');
   });
 
   it('111–114 — тоже исключение', () => {
-    expect(formatDaysSpent(111)).toBe('за 111 дней');
+    expect(formatDaysSpent(111, 'ru')).toBe('за 111 дней');
   });
 
   it('101 — «день»', () => {
-    expect(formatDaysSpent(101)).toBe('за 101 день');
+    expect(formatDaysSpent(101, 'ru')).toBe('за 101 день');
+  });
+
+  it('по-английски: day для одного, days для остальных', () => {
+    expect(formatDaysSpent(1, 'en')).toBe('in 1 day');
+    expect(formatDaysSpent(2, 'en')).toBe('in 2 days');
+    expect(formatDaysSpent(11, 'en')).toBe('in 11 days');
+    expect(formatDaysSpent(21, 'en')).toBe('in 21 days');
   });
 });
 

@@ -25,6 +25,7 @@ import {
   ROUTE_X,
   ROUTE_Y,
 } from '@/ui/logo-geometry';
+import { useT } from '@/i18n';
 import { colors, space, text, trailGradient } from '@/ui/tokens';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
@@ -160,6 +161,7 @@ type Props = {
  */
 export function AnimatedSplash({ onDone }: Props) {
   const reduceMotion = useReducedMotion();
+  const skipLabel = useT().splash.skip;
   const t = useSharedValue(0);
   const fade = useSharedValue(1);
   const leaving = useSharedValue(false);
@@ -264,7 +266,7 @@ export function AnimatedSplash({ onDone }: Props) {
         style={styles.press}
         onPress={() => leave(TIMELINE.fadeOut / 2)}
         accessibilityRole="button"
-        accessibilityLabel="Пропустить заставку"
+        accessibilityLabel={skipLabel}
       >
         <View style={styles.stage}>
           <Svg width={RING_BOX} height={RING_BOX} style={styles.ring} pointerEvents="none">

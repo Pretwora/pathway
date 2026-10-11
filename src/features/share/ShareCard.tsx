@@ -5,6 +5,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import type { Goal } from '@/db/schema';
 import { daysSpent, formatDaysSpent } from '@/domain/day';
 import { isClosedEarly, overshoot, progressFraction } from '@/domain/progress';
+import { useLang, useT } from '@/i18n';
 import { Trail } from '@/ui/components/Trail';
 import { colors, radius, space, text } from '@/ui/tokens';
 
@@ -31,6 +32,8 @@ export const ShareCard = forwardRef<View, Props>(function ShareCard({ goal, prog
   const extra = overshoot(progress, goal.target);
   const days = daysSpent(goal.createdAt, finishedAt);
   const early = isClosedEarly(progress, goal.target);
+  const t = useT();
+  const lang = useLang();
 
   return (
     <View ref={ref} style={styles.card} collapsable={false}>
@@ -40,15 +43,15 @@ export const ShareCard = forwardRef<View, Props>(function ShareCard({ goal, prog
       </View>
 
       <View style={styles.center}>
-        <Text style={styles.kicker}>{early ? 'Цель закрыта' : 'Цель достигнута'}</Text>
+        <Text style={styles.kicker}>{early ? t.share.closed : t.common.goalReached}</Text>
         <Text style={styles.number} numberOfLines={1} adjustsFontSizeToFit>
           {progress}
         </Text>
         <Text style={styles.title}>{goal.title}</Text>
         <Text style={styles.meta}>
-          {formatDaysSpent(days)}
-          {extra > 0 ? <Text style={styles.extra}> · перевыполнено на {extra}</Text> : null}
-          {early ? <Text> · цель была {goal.target}</Text> : null}
+          {formatDaysSpent(days, lang)}
+          {extra > 0 ? <Text style={styles.extra}>{t.share.overBySuffix(extra)}</Text> : null}
+          {early ? <Text>{t.share.targetWasSuffix(goal.target)}</Text> : null}
         </Text>
       </View>
 

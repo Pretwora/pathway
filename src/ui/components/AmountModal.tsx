@@ -2,13 +2,14 @@ import { useState } from 'react';
 import { KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { isValidAmount } from '@/domain/progress';
+import { useT } from '@/i18n';
 import { Button } from '@/ui/components/Button';
 import { colors, layout, radius, space, text } from '@/ui/tokens';
 
 type Props = {
   /** Заголовок и подпись зависят от того, добавляем мы или правим день. */
   mode: 'add' | 'edit';
-  /** Для правки: подпись дня («17 июля») и его текущее значение. */
+  /** Для правки: подпись дня («17 июля» / «Jul 17») и его текущее значение. */
   dayLabel?: string;
   initialValue?: number;
   onClose: () => void;
@@ -30,6 +31,7 @@ export function AmountModal({ mode, dayLabel, initialValue, onClose, onSubmit }:
     mode === 'edit' && initialValue !== undefined ? String(initialValue) : '',
   );
 
+  const t = useT();
   const amount = Number.parseInt(value, 10);
   const valid = isValidAmount(amount) && (mode === 'edit' || amount > 0);
 
@@ -46,7 +48,7 @@ export function AmountModal({ mode, dayLabel, initialValue, onClose, onSubmit }:
           {/* Пустой onPress: гасит всплытие, иначе тап по самой карточке её закроет. */}
           <Pressable style={styles.card} onPress={() => {}}>
             <Text style={styles.title}>
-              {mode === 'edit' ? `Сколько было ${dayLabel}` : 'Сколько добавить'}
+              {mode === 'edit' ? t.amount.editTitle(dayLabel ?? '') : t.amount.addTitle}
             </Text>
 
             <TextInput
@@ -64,13 +66,13 @@ export function AmountModal({ mode, dayLabel, initialValue, onClose, onSubmit }:
             />
 
             {mode === 'edit' ? (
-              <Text style={styles.hint}>Ноль уберёт этот день из истории.</Text>
+              <Text style={styles.hint}>{t.amount.zeroHint}</Text>
             ) : null}
 
             <View style={styles.actions}>
-              <Button title="Отмена" variant="ghost" onPress={onClose} style={styles.action} />
+              <Button title={t.common.cancel} variant="ghost" onPress={onClose} style={styles.action} />
               <Button
-                title={mode === 'edit' ? 'Исправить' : 'Добавить'}
+                title={mode === 'edit' ? t.amount.save : t.amount.add}
                 onPress={submit}
                 disabled={!valid}
                 style={styles.action}

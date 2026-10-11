@@ -9,6 +9,7 @@ import { dayKey, dayNumber, formatDay } from '@/domain/day';
 import { isReached, progressFraction, remaining } from '@/domain/progress';
 import { Celebration } from '@/features/celebration/Celebration';
 import { FinishGoalModal } from '@/features/counter/FinishGoalModal';
+import { useLang, useT } from '@/i18n';
 import { useGoalActions } from '@/store/useGoalActions';
 import { useGoalStore } from '@/store/useGoalStore';
 import { AmountModal } from '@/ui/components/AmountModal';
@@ -47,6 +48,8 @@ export function CounterScreen({ goal }: { goal: Goal }) {
   const progress = useProgress(goal.id);
   const { days } = useDays(goal.id);
   const { setDayAmount, archiveGoal, deleteGoal } = useGoalActions();
+  const t = useT();
+  const lang = useLang();
 
   const addAmount = useGoalStore((s) => s.addAmount);
   const undoSession = useGoalStore((s) => s.undoSession);
@@ -125,17 +128,15 @@ export function CounterScreen({ goal }: { goal: Goal }) {
             действие над целью, а не переход, и соседство с «Архивом»
             путало бы их. */}
         <View style={styles.topBar}>
-          <HeaderButton title="Завершить" onPress={() => setFinishing(true)} />
+          <HeaderButton title={t.counter.finish} onPress={() => setFinishing(true)} />
           <View style={styles.topNav}>
-            <IconButton icon="archive" label="Архив" onPress={() => router.push('/archive')} />
-            <IconButton icon="settings" label="Настройки" onPress={() => router.push('/settings')} />
+            <IconButton icon="archive" label={t.common.archive} onPress={() => router.push('/archive')} />
+            <IconButton icon="settings" label={t.common.settings} onPress={() => router.push('/settings')} />
           </View>
         </View>
 
         <View style={styles.header}>
-          <Text style={styles.kicker}>
-            День {day} · с {formatDay(dayKey(goal.createdAt))}
-          </Text>
+          <Text style={styles.kicker}>{t.counter.dayKicker(day, formatDay(dayKey(goal.createdAt), lang))}</Text>
           {/* Без numberOfLines: обрезать название нечестно — человек должен
               видеть, что делает, целиком. Место под это отдаёт история. */}
           <Text style={styles.title}>{goal.title}</Text>
@@ -148,7 +149,7 @@ export function CounterScreen({ goal }: { goal: Goal }) {
           </Text>
           <View style={styles.counterSide}>
             <Text style={styles.percent}>{percent}%</Text>
-            <Text style={styles.target}>из {goal.target}</Text>
+            <Text style={styles.target}>{t.common.of(goal.target)}</Text>
           </View>
         </View>
 
@@ -156,19 +157,22 @@ export function CounterScreen({ goal }: { goal: Goal }) {
           <Trail fraction={fraction} width={width - layout.screenPadding * 2} />
         </View>
 
-        {/* Без единицы: её нет в модели, а «осталось 5» и так однозначно. */}
+        {/* Без единицы: её нет в модели, а «осталось 5» и так однозначно.
+            Слова до и после числа — из словаря: в английском оно стоит первым. */}
         <Text style={styles.remaining}>
-          осталось <Text style={styles.remainingNumber}>{left}</Text>
+          {t.counter.leftBefore}
+          <Text style={styles.remainingNumber}>{left}</Text>
+          {t.counter.leftAfter}
         </Text>
 
         <View style={styles.history}>
           {days.length === 0 ? (
-            <Text style={styles.empty}>Пока пусто. Тапни кнопку внизу, когда сделаешь первый подход.</Text>
+            <Text style={styles.empty}>{t.counter.empty}</Text>
           ) : (
             <>
               <View style={styles.historyHead}>
-                <Text style={styles.historyLabel}>По дням</Text>
-                <Text style={styles.historyHint}>свайп — исправить</Text>
+                <Text style={styles.historyLabel}>{t.counter.byDay}</Text>
+                <Text style={styles.historyHint}>{t.counter.swipeHint}</Text>
               </View>
               {days.map((entry, i) => (
                 <DayRow
@@ -209,7 +213,7 @@ export function CounterScreen({ goal }: { goal: Goal }) {
           accessibilityRole="button"
           style={({ pressed }) => [styles.manual, pressed && styles.manualPressed]}
         >
-          <Text style={styles.manualLabel}>Другое количество</Text>
+          <Text style={styles.manualLabel}>{t.counter.customAmount}</Text>
         </Pressable>
       </View>
 
@@ -226,7 +230,7 @@ export function CounterScreen({ goal }: { goal: Goal }) {
         <AmountModal
           key={editing.id}
           mode="edit"
-          dayLabel={formatDay(editing.day)}
+          dayLabel={formatDay(editing.day, lang)}
           initialValue={editing.amount}
           onClose={() => setEditing(null)}
           onSubmit={(amount) => void setDayAmount(editing.id, amount)}

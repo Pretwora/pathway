@@ -152,7 +152,8 @@ export async function replaceAll(newGoals: Goal[], newEntries: Entry[]): Promise
 export async function repeatGoal(goalId: string, now = Date.now()): Promise<Goal> {
   const rows = await db.select().from(goals).where(eq(goals.id, goalId)).limit(1);
   const source = rows[0];
-  if (!source) throw new Error('Цель не найдена');
+  // Служебная ошибка: человек её не видит, поэтому не переводится.
+  if (!source) throw new Error(`Goal ${goalId} not found`);
 
   return createGoal(
     {

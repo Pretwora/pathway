@@ -1,20 +1,23 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 
+import { useT } from '@/i18n';
+import { colors, space, text } from '@/ui/tokens';
 import { writeToDeveloper } from './contact';
 import { CONTACT_EMAIL } from './testers';
-import { colors, space, text } from '@/ui/tokens';
 
 /**
  * Адрес разработчика. Подчёркнут, потому что одного акцентного цвета мало:
- * красным в приложении набраны и обычные подписи, и человек не понимает,
+ * акцентом в приложении набраны и обычные подписи, и человек не понимает,
  * что по этой строке можно нажать.
  */
 export function ContactLink() {
+  const t = useT();
+
   return (
     <Pressable
       onPress={() => void writeToDeveloper()}
       accessibilityRole="link"
-      accessibilityLabel={`Написать на ${CONTACT_EMAIL}`}
+      accessibilityLabel={t.developer.writeTo(CONTACT_EMAIL)}
       hitSlop={space.sm}
       style={({ pressed }) => (pressed ? styles.pressed : undefined)}
     >

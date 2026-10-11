@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { useT } from '@/i18n';
 import { Button } from '@/ui/components/Button';
 import { colors, layout, radius, space, text } from '@/ui/tokens';
 
@@ -32,6 +33,7 @@ export function FinishGoalModal({ progress, target, onClose, onArchive, onDelete
    * история. Пустую цель («начал не то») стираем сразу, там терять нечего.
    */
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const t = useT();
 
   function onDeletePress() {
     if (progress > 0) {
@@ -48,33 +50,28 @@ export function FinishGoalModal({ progress, target, onClose, onArchive, onDelete
         <Pressable style={styles.card} onPress={() => {}}>
           {confirmingDelete ? (
             <>
-              <Text style={styles.title}>Удалить цель?</Text>
-              <Text style={styles.body}>
-                Исчезнет вся история — {progress} из {target}. Отменить нельзя.
-              </Text>
+              <Text style={styles.title}>{t.finishGoal.deleteTitle}</Text>
+              <Text style={styles.body}>{t.finishGoal.deleteBody(progress, target)}</Text>
 
               <View style={styles.actions}>
-                <Button title="Удалить" variant="danger" onPress={onDelete} />
-                <Button title="Назад" variant="ghost" onPress={() => setConfirmingDelete(false)} />
+                <Button title={t.common.delete} variant="danger" onPress={onDelete} />
+                <Button title={t.common.back} variant="ghost" onPress={() => setConfirmingDelete(false)} />
               </View>
             </>
           ) : (
             <>
-              <Text style={styles.title}>Завершить цель?</Text>
-              <Text style={styles.body}>
-                Сейчас {progress} из {target}. В архиве цель сохранится вместе с историей — её
-                можно будет продолжить. Удаление сотрёт её целиком.
-              </Text>
+              <Text style={styles.title}>{t.finishGoal.title}</Text>
+              <Text style={styles.body}>{t.finishGoal.body(progress, target)}</Text>
 
               <View style={styles.actions}>
-                <Button title="В архив" onPress={onArchive} />
-                <Button title="Отмена" variant="ghost" onPress={onClose} />
+                <Button title={t.common.toArchive} onPress={onArchive} />
+                <Button title={t.common.cancel} variant="ghost" onPress={onClose} />
               </View>
 
               {/* Отделено намеренно: необратимое действие не должно стоять
                   вплотную к обычным, чтобы в него не попадали мимо. */}
               <View style={styles.destructive}>
-                <Button title="Удалить" variant="danger" onPress={onDeletePress} />
+                <Button title={t.common.delete} variant="danger" onPress={onDeletePress} />
               </View>
             </>
           )}

@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { DESCRIPTION_MAX, TITLE_MAX } from '@/domain/goal';
+import { useT } from '@/i18n';
 import { useGoalActions } from '@/store/useGoalActions';
 import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
@@ -22,6 +23,7 @@ const DEFAULT_STEPS = [5, 10, 20];
 
 export default function NewGoalScreen() {
   const { createGoal } = useGoalActions();
+  const t = useT();
 
   // Шаблонов нет: форма всегда пустая, подсказки — в плейсхолдерах.
   // Шаги по умолчанию стоят сразу: пустые три поля пугают сильнее, чем
@@ -146,11 +148,11 @@ export default function NewGoalScreen() {
         keyboardDismissMode="on-drag"
       >
         <View style={styles.header}>
-          <IconButton icon="back" label="Назад" onPress={goBack} />
-          <Text style={styles.heading}>Новая цель</Text>
+          <IconButton icon="back" label={t.common.back} onPress={goBack} />
+          <Text style={styles.heading}>{t.newGoal.title}</Text>
         </View>
 
-        <Field label="Название">
+        <Field label={t.newGoal.nameLabel}>
           <TextInput
             style={[styles.input, active === 'title' && styles.inputActive]}
             value={title}
@@ -160,13 +162,13 @@ export default function NewGoalScreen() {
               onFieldFocus(null);
             }}
             onBlur={() => setActive(null)}
-            placeholder="Например, тысяча отжиманий"
+            placeholder={t.newGoal.namePlaceholder}
             placeholderTextColor={colors.textTertiary}
             maxLength={TITLE_MAX}
           />
         </Field>
 
-        <Field label="Сколько всего">
+        <Field label={t.newGoal.targetLabel}>
           <TextInput
             style={[styles.input, styles.numberInput, active === 'target' && styles.inputActive]}
             value={target}
@@ -176,14 +178,14 @@ export default function NewGoalScreen() {
               onFieldFocus(null);
             }}
             onBlur={() => setActive(null)}
-            placeholder="1000"
+            placeholder={t.newGoal.targetPlaceholder}
             placeholderTextColor={colors.textTertiary}
             keyboardType="number-pad"
             maxLength={9}
           />
         </Field>
 
-        <Field label="Описание" onLayout={onDescriptionLayout}>
+        <Field label={t.newGoal.descriptionLabel} onLayout={onDescriptionLayout}>
           <TextInput
             style={[styles.input, styles.description, active === 'description' && styles.inputActive]}
             value={description}
@@ -193,19 +195,17 @@ export default function NewGoalScreen() {
               onFieldFocus('description');
             }}
             onBlur={() => setActive(null)}
-            placeholder="По 30–50 за подход, утром и вечером."
+            placeholder={t.newGoal.descriptionPlaceholder}
             placeholderTextColor={colors.textTertiary}
             maxLength={DESCRIPTION_MAX}
             multiline
             // Без этого на iOS текст в многострочном поле липнет к верхнему краю.
             textAlignVertical="top"
           />
-          <Text style={styles.hint}>
-            Не обязательно. Видно под названием на счётчике. {description.length} из {DESCRIPTION_MAX}
-          </Text>
+          <Text style={styles.hint}>{t.newGoal.descriptionHint(description.length, DESCRIPTION_MAX)}</Text>
         </Field>
 
-        <Field label="Кнопки быстрого добавления" onLayout={onStepsLayout}>
+        <Field label={t.newGoal.stepsLabel} onLayout={onStepsLayout}>
           <View style={styles.row}>
             {steps.map((s, i) => (
               <View key={i} style={[styles.input, styles.stepBox, active === `step-${i}` && styles.inputActive]}>
@@ -221,19 +221,16 @@ export default function NewGoalScreen() {
                   onBlur={() => setActive(null)}
                   keyboardType="number-pad"
                   maxLength={5}
-                  accessibilityLabel={`Шаг ${i + 1}`}
+                  accessibilityLabel={t.newGoal.stepA11y(i + 1)}
                 />
               </View>
             ))}
           </View>
-          <Text style={styles.hint}>
-            Числа на больших кнопках внизу счётчика. Поставь то, чем считаешь на самом деле — любое другое
-            количество можно ввести вручную.
-          </Text>
+          <Text style={styles.hint}>{t.newGoal.stepsHint}</Text>
         </Field>
 
         <Button
-          title={saving ? 'Создаём…' : 'Начать'}
+          title={saving ? t.newGoal.creating : t.newGoal.start}
           onPress={onSubmit}
           disabled={!valid || saving}
           style={styles.submit}

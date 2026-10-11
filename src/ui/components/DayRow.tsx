@@ -7,6 +7,7 @@ import Animated, { useAnimatedStyle, type SharedValue } from 'react-native-reani
 
 import type { Entry } from '@/db/schema';
 import { formatDay } from '@/domain/day';
+import { useLang, useT } from '@/i18n';
 import { colors, radius, space, text } from '@/ui/tokens';
 
 const ACTION_WIDTH = 112;
@@ -22,6 +23,7 @@ type Props = {
 };
 
 function EditAction({ drag, onPress }: { drag: SharedValue<number>; onPress: () => void }) {
+  const t = useT();
   const animated = useAnimatedStyle(() => ({
     transform: [{ translateX: drag.get() + ACTION_WIDTH }],
   }));
@@ -31,7 +33,7 @@ function EditAction({ drag, onPress }: { drag: SharedValue<number>; onPress: () 
       {/* Именно Pressable: плашка выглядит кнопкой, значит должна нажиматься.
           Открывать правку только по доехавшему до конца свайпу — ловушка. */}
       <Pressable style={styles.action} onPress={onPress} accessibilityRole="button">
-        <Text style={styles.actionLabel}>Исправить</Text>
+        <Text style={styles.actionLabel}>{t.counter.edit}</Text>
       </Pressable>
     </Animated.View>
   );
@@ -43,6 +45,7 @@ function EditAction({ drag, onPress }: { drag: SharedValue<number>; onPress: () 
  */
 export function DayRow({ entry, onEdit, first, last }: Props) {
   const swipeable = useRef<SwipeableMethods>(null);
+  const lang = useLang();
 
   function openEdit() {
     // Закрываем свайп, иначе после правки строка останется разъехавшейся.
@@ -66,7 +69,7 @@ export function DayRow({ entry, onEdit, first, last }: Props) {
           <View style={[styles.dot, first && styles.dotCurrent]} />
           <View style={[styles.line, last && styles.lineHidden]} />
         </View>
-        <Text style={styles.day}>{formatDay(entry.day)}</Text>
+        <Text style={styles.day}>{formatDay(entry.day, lang)}</Text>
         <Text style={styles.amount}>{entry.amount}</Text>
       </View>
     </ReanimatedSwipeable>

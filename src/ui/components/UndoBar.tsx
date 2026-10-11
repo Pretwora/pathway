@@ -9,6 +9,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
+import { useT } from '@/i18n';
 import { colors, fonts, radius, space, text } from '@/ui/tokens';
 import { Icon } from './Icon';
 
@@ -44,6 +45,7 @@ type Props = {
 export function UndoBar({ amount, onUndo, onDone, durationMs, resetKey }: Props) {
   // 1 — полная плашка, 0 — пустая.
   const fill = useSharedValue(1);
+  const t = useT();
 
   useEffect(() => {
     fill.set(1);
@@ -60,7 +62,7 @@ export function UndoBar({ amount, onUndo, onDone, durationMs, resetKey }: Props)
       <Text style={styles.amount}>+{amount}</Text>
 
       <Pressable onPress={onUndo} hitSlop={12} accessibilityRole="button">
-        <Text style={styles.undo}>Отменить</Text>
+        <Text style={styles.undo}>{t.counter.undo}</Text>
       </Pressable>
 
       {/* Разделитель: два действия рядом, и промахнуться по «Отменить» нельзя. */}
@@ -70,7 +72,7 @@ export function UndoBar({ amount, onUndo, onDone, durationMs, resetKey }: Props)
         onPress={onDone}
         hitSlop={12}
         accessibilityRole="button"
-        accessibilityLabel="Готово"
+        accessibilityLabel={t.common.done}
         style={({ pressed }) => [styles.done, pressed && styles.donePressed]}
       >
         <Icon name="check" size={16} color={colors.text} strokeWidth={2.6} />

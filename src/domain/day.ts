@@ -6,12 +6,18 @@
  * а факт: тап попадает в сегодняшний день, и всё.
  */
 
+import type { Lang } from './lang';
+
 export const DAY_MS = 24 * 60 * 60 * 1000;
 
-const MONTHS = [
+/** Русские месяцы — в родительном падеже: «17 июля». */
+const MONTHS_RU = [
   'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
   'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря',
 ];
+
+/** Английские — сокращённые, как в календарях: «Jul 17». */
+const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /**
  * Ключ дня по локальному времени устройства: «2026-07-17».
@@ -26,10 +32,14 @@ export function dayKey(timestamp: number): string {
   return `${d.getFullYear()}-${month}-${day}`;
 }
 
-/** «2026-07-17» → «17 июля». Месяц склоняем таблицей: его задаём мы, а не пользователь. */
-export function formatDay(key: string): string {
+/**
+ * «2026-07-17» → «17 июля» / «Jul 17». Месяц склоняем таблицей: его задаём мы,
+ * а не пользователь. Год не пишем: цели живут недели, а не годы.
+ */
+export function formatDay(key: string, lang: Lang): string {
   const [, month, day] = key.split('-');
-  return `${Number(day)} ${MONTHS[Number(month) - 1]}`;
+  const m = Number(month) - 1;
+  return lang === 'en' ? `${MONTHS_EN[m]} ${Number(day)}` : `${Number(day)} ${MONTHS_RU[m]}`;
 }
 
 /**
@@ -59,8 +69,12 @@ export function daysSpent(startedAt: number, finishedAt: number): number {
   return dayNumber(startedAt, finishedAt);
 }
 
-/** «за 1 день», «за 3 дня», «за 24 дня». Слово наше — значит склоняем. */
-export function formatDaysSpent(days: number): string {
+/**
+ * «за 1 день», «за 3 дня», «за 24 дня» / «in 1 day», «in 24 days».
+ * Слово наше — значит склоняем.
+ */
+export function formatDaysSpent(days: number, lang: Lang): string {
+  if (lang === 'en') return `in ${days} ${days === 1 ? 'day' : 'days'}`;
   const lastTwo = days % 100;
   const last = days % 10;
   if (lastTwo >= 11 && lastTwo <= 14) return `за ${days} дней`;

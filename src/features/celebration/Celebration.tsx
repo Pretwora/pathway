@@ -8,6 +8,7 @@ import type { Goal } from '@/db/schema';
 import { daysSpent, formatDaysSpent } from '@/domain/day';
 import { overshoot } from '@/domain/progress';
 import { ShareSheet } from '@/features/share/ShareSheet';
+import { useLang, useT } from '@/i18n';
 import { Button } from '@/ui/components/Button';
 import { Trail } from '@/ui/components/Trail';
 import { colors, layout, space, text } from '@/ui/tokens';
@@ -39,6 +40,8 @@ export function Celebration({ goal, progress, onArchive }: Props) {
   const extra = overshoot(progress, goal.target);
   const days = daysSpent(goal.createdAt, finishedAt);
   const [sharing, setSharing] = useState(false);
+  const t = useT();
+  const lang = useLang();
 
   useEffect(() => {
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -58,7 +61,7 @@ export function Celebration({ goal, progress, onArchive }: Props) {
           <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
             <View style={styles.body}>
               <Animated.Text entering={FadeInDown.duration(400)} style={styles.kicker}>
-                Цель достигнута
+                {t.common.goalReached}
               </Animated.Text>
 
               <Animated.Text
@@ -75,12 +78,12 @@ export function Celebration({ goal, progress, onArchive }: Props) {
               </Animated.Text>
 
               <Animated.Text entering={FadeIn.duration(400).delay(600)} style={styles.days}>
-                {formatDaysSpent(days)}
+                {formatDaysSpent(days, lang)}
               </Animated.Text>
 
               {extra > 0 ? (
                 <Animated.Text entering={FadeIn.duration(400).delay(800)} style={styles.extra}>
-                  перевыполнено на {extra}
+                  {t.common.overBy(extra)}
                 </Animated.Text>
               ) : null}
             </View>
@@ -92,8 +95,8 @@ export function Celebration({ goal, progress, onArchive }: Props) {
             </Animated.View>
 
             <Animated.View entering={FadeInDown.duration(400).delay(1000)} style={styles.actions}>
-              <Button title="Поделиться" icon="share" onPress={() => setSharing(true)} />
-              <Button title="В архив" variant="ghost" onPress={onArchive} />
+              <Button title={t.common.share} icon="share" onPress={() => setSharing(true)} />
+              <Button title={t.common.toArchive} variant="ghost" onPress={onArchive} />
             </Animated.View>
           </SafeAreaView>
 

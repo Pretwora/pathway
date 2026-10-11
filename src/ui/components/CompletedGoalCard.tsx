@@ -5,6 +5,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import type { Goal } from '@/db/schema';
 import { dayKey, formatDay } from '@/domain/day';
 import { isClosedEarly, progressFraction } from '@/domain/progress';
+import { useLang, useT } from '@/i18n';
 import { colors, radius, space, text, trailGradient } from '@/ui/tokens';
 
 type Props = {
@@ -48,6 +49,8 @@ function ResultBar({ fraction }: { fraction: number }) {
  */
 export function CompletedGoalCard({ goal, total, onPress }: Props) {
   const early = isClosedEarly(total, goal.target);
+  const t = useT();
+  const lang = useLang();
 
   return (
     <Pressable
@@ -61,16 +64,16 @@ export function CompletedGoalCard({ goal, total, onPress }: Props) {
       <View style={styles.row}>
         <View style={styles.result}>
           <Text style={styles.number}>{total}</Text>
-          {early ? <Text style={styles.of}>из {goal.target}</Text> : null}
+          {early ? <Text style={styles.of}>{t.common.of(goal.target)}</Text> : null}
           {/* Акцент здесь уместен именно потому, что применяется редко:
               недобранных целей в архиве меньшинство. */}
           {early ? (
             <View style={styles.early}>
-              <Text style={styles.earlyLabel}>досрочно</Text>
+              <Text style={styles.earlyLabel}>{t.archive.early}</Text>
             </View>
           ) : null}
         </View>
-        {goal.completedAt ? <Text style={styles.date}>{formatDay(dayKey(goal.completedAt))}</Text> : null}
+        {goal.completedAt ? <Text style={styles.date}>{formatDay(dayKey(goal.completedAt), lang)}</Text> : null}
       </View>
       <ResultBar fraction={progressFraction(total, goal.target)} />
     </Pressable>

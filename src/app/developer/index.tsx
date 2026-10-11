@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ContactLink } from '@/features/developer/ContactLink';
-import { AUTHOR } from '@/features/developer/testers';
+import { useT } from '@/i18n';
 import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
 import { goBack } from '@/ui/goBack';
@@ -13,29 +13,28 @@ import { colors, layout, space, text } from '@/ui/tokens';
 /** Визитка: кто сделал, куда писать, какая версия. Вход — из архива. */
 export default function DeveloperScreen() {
   const version = Constants.expoConfig?.version ?? '1.0.0';
+  const t = useT();
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
-        <IconButton icon="back" label="Назад" onPress={goBack} />
-        <Text style={styles.title}>Разработчик</Text>
+        <IconButton icon="back" label={t.common.back} onPress={goBack} />
+        <Text style={styles.title}>{t.developer.title}</Text>
       </View>
 
       <View style={styles.body}>
 
         <View style={styles.card}>
-          <Text style={styles.name}>{AUTHOR}</Text>
+          <Text style={styles.name}>{t.developer.author}</Text>
           <ContactLink />
         </View>
 
-        <Text style={styles.hint}>
-          Нашёл ошибку или чего-то не хватает — напиши. Отвечаю всем.
-        </Text>
+        <Text style={styles.hint}>{t.developer.hint}</Text>
 
         <Button
-          title="Бета-тестеры"
+          title={t.developer.testers}
           variant="ghost"
           onPress={() => router.push('/developer/testers')}
         />

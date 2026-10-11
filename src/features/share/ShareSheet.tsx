@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { captureRef } from 'react-native-view-shot';
 
 import type { Goal } from '@/db/schema';
+import { useT } from '@/i18n';
 import { Button } from '@/ui/components/Button';
 import { colors, layout, space, text } from '@/ui/tokens';
 import { ShareCard } from './ShareCard';
@@ -20,6 +21,7 @@ type Props = {
 export function ShareSheet({ goal, progress, finishedAt, onClose }: Props) {
   const cardRef = useRef<View>(null);
   const [busy, setBusy] = useState(false);
+  const t = useT();
 
   async function onShare() {
     if (busy) return;
@@ -29,12 +31,12 @@ export function ShareSheet({ goal, progress, finishedAt, onClose }: Props) {
       const uri = await captureRef(cardRef, { format: 'png', quality: 1, result: 'tmpfile' });
 
       if (!(await Sharing.isAvailableAsync())) {
-        Alert.alert('Недоступно', 'Здесь нельзя поделиться картинкой.');
+        Alert.alert(t.common.unavailable, t.share.unavailable);
         return;
       }
-      await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: 'Поделиться достижением' });
-    } catch (e) {
-      Alert.alert('Не получилось', e instanceof Error ? e.message : 'Ошибка при создании картинки');
+      await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: t.share.dialogTitle });
+    } catch {
+      Alert.alert(t.common.failed, t.share.failed);
     } finally {
       setBusy(false);
     }
@@ -49,9 +51,9 @@ export function ShareSheet({ goal, progress, finishedAt, onClose }: Props) {
         </Pressable>
 
         <SafeAreaView edges={['bottom']} style={styles.actions}>
-          <Button title={busy ? 'Готовим…' : 'Поделиться'} onPress={onShare} disabled={busy} />
+          <Button title={busy ? t.share.preparing : t.common.share} onPress={onShare} disabled={busy} />
           <Text style={styles.close} onPress={onClose} accessibilityRole="button">
-            Закрыть
+            {t.common.close}
           </Text>
         </SafeAreaView>
       </Pressable>

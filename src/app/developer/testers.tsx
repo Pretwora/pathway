@@ -4,30 +4,31 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ContactLink } from '@/features/developer/ContactLink';
 import { TESTERS } from '@/features/developer/testers';
+import { useT } from '@/i18n';
 import { IconButton } from '@/ui/components/IconButton';
 import { goBack } from '@/ui/goBack';
 import { colors, layout, radius, space, text } from '@/ui/tokens';
 
 /** Титры: кто проверял приложение до выхода, и как попасть в этот список. */
 export default function TestersScreen() {
+  const t = useT();
+
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
-        <IconButton icon="back" label="Назад" onPress={goBack} />
-        <Text style={styles.title}>Бета-тестеры</Text>
+        <IconButton icon="back" label={t.common.back} onPress={goBack} />
+        <Text style={styles.title}>{t.testers.title}</Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.body}>
 
         {TESTERS.length === 0 ? (
-          <Text style={styles.empty}>
-            Список пока пуст. Первые имена появятся, когда закончится закрытое тестирование.
-          </Text>
+          <Text style={styles.empty}>{t.testers.empty}</Text>
         ) : (
           <>
-            <Text style={styles.lead}>Эти люди проверяли приложение до выхода.</Text>
+            <Text style={styles.lead}>{t.testers.lead}</Text>
             <View style={styles.list}>
               {TESTERS.map((name) => (
                 <View key={name} style={styles.row}>
@@ -39,11 +40,8 @@ export default function TestersScreen() {
         )}
 
         <View style={styles.invite}>
-          <Text style={styles.inviteTitle}>Хочешь сюда?</Text>
-          <Text style={styles.inviteText}>
-            Напиши — расскажу, что нужно проверить. Имя появится в этом списке со следующим
-            обновлением.
-          </Text>
+          <Text style={styles.inviteTitle}>{t.testers.inviteTitle}</Text>
+          <Text style={styles.inviteText}>{t.testers.inviteText}</Text>
           <ContactLink />
         </View>
       </ScrollView>

@@ -1,16 +1,24 @@
 import Constants from 'expo-constants';
 import { Stack } from 'expo-router';
 import { useState } from 'react';
-import { Alert, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { LANGS } from '@/domain/lang';
 import { exportBackup, pickBackup, restoreBackup } from '@/features/settings/backup';
+import { LANGUAGE_NAMES, backupErrorText, useLanguageStore, useT } from '@/i18n';
 import { Button } from '@/ui/components/Button';
 import { IconButton } from '@/ui/components/IconButton';
+import { Segmented } from '@/ui/components/Segmented';
 import { goBack } from '@/ui/goBack';
 import { colors, layout, space, text } from '@/ui/tokens';
 
+const LANGUAGE_OPTIONS = LANGS.map((value) => ({ value, label: LANGUAGE_NAMES[value], lang: value }));
+
 export default function SettingsScreen() {
+  const t = useT();
+  const lang = useLanguageStore((s) => s.lang);
+  const setLang = useLanguageStore((s) => s.setLang);
   const [busy, setBusy] = useState(false);
   const version = Constants.expoConfig?.version ?? '1.0.0';
 
@@ -19,9 +27,9 @@ export default function SettingsScreen() {
     setBusy(true);
     try {
       const ok = await exportBackup();
-      if (!ok) Alert.alert('Недоступно', 'Здесь нельзя сохранить файл.');
-    } catch (e) {
-      Alert.alert('Не получилось', e instanceof Error ? e.message : 'Ошибка при сохранении копии');
+      if (!ok) Alert.alert(t.common.unavailable, t.settings.exportUnavailable);
+    } catch {
+      Alert.alert(t.common.failed, t.settings.exportFailed);
     } finally {
       setBusy(false);
     }
@@ -35,26 +43,19 @@ export default function SettingsScreen() {
       if (!data) return; // передумал выбирать
 
       // Замена необратима — спрашиваем явно, с числами из копии.
-      Alert.alert(
-        'Восстановить из копии?',
-        `В копии целей: ${data.goals.length}, записей: ${data.entries.length}. ` +
-          'Все текущие данные будут заменены. Отменить нельзя.',
-        [
-          { text: 'Отмена', style: 'cancel' },
-          {
-            text: 'Восстановить',
-            style: 'destructive',
-            onPress: () =>
-              void restoreBackup(data)
-                .then(() => Alert.alert('Готово', 'Данные восстановлены из копии.'))
-                .catch((e) =>
-                  Alert.alert('Не получилось', e instanceof Error ? e.message : 'Ошибка восстановления'),
-                ),
-          },
-        ],
-      );
+      Alert.alert(t.settings.restoreTitle, t.settings.restoreBody(data.goals.length, data.entries.length), [
+        { text: t.common.cancel, style: 'cancel' },
+        {
+          text: t.settings.restoreConfirm,
+          style: 'destructive',
+          onPress: () =>
+            void restoreBackup(data)
+              .then(() => Alert.alert(t.common.done, t.settings.restored))
+              .catch(() => Alert.alert(t.common.failed, t.settings.restoreFailed)),
+        },
+      ]);
     } catch (e) {
-      Alert.alert('Не тот файл', e instanceof Error ? e.message : 'Не удалось прочитать копию');
+      Alert.alert(t.settings.wrongFile, backupErrorText(e));
     } finally {
       setBusy(false);
     }
@@ -65,22 +66,24 @@ export default function SettingsScreen() {
       <Stack.Screen options={{ headerShown: false }} />
 
       <View style={styles.header}>
-        <IconButton icon="back" label="Назад" onPress={goBack} />
-        <Text style={styles.title}>Настройки</Text>
+        <IconButton icon="back" label={t.common.back} onPress={goBack} />
+        <Text style={styles.title}>{t.settings.title}</Text>
       </View>
 
-      <View style={styles.body}>
+      {/* Скролл — на случай крупного системного шрифта: подсказка под копией длинная. */}
+      <ScrollView style={styles.scroll} contentContainerStyle={styles.body}>
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>{t.settings.language}</Text>
+          <Segmented options={LANGUAGE_OPTIONS} value={lang} onChange={setLang} label={t.settings.language} />
+        </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Данные</Text>
-          <Button title={busy ? 'Сохраняем…' : 'Сохранить копию данных'} onPress={onExport} disabled={busy} />
-          <Button title="Восстановить из копии" variant="ghost" onPress={onImport} disabled={busy} />
-          <Text style={styles.hint}>
-            Данные хранятся только на этом телефоне. Сохрани копию в облако или отправь себе — иначе при
-            смене телефона история пропадёт. Восстановление заменит всё, что есть сейчас.
-          </Text>
+          <Text style={styles.sectionLabel}>{t.settings.data}</Text>
+          <Button title={busy ? t.settings.exporting : t.settings.export} onPress={onExport} disabled={busy} />
+          <Button title={t.settings.restore} variant="ghost" onPress={onImport} disabled={busy} />
+          <Text style={styles.hint}>{t.settings.hint}</Text>
         </View>
-      </View>
+      </ScrollView>
 
       <Text style={styles.footer}>Pathway · {version}</Text>
     </SafeAreaView>
@@ -96,7 +99,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenPadding,
     paddingTop: space.base,
   },
-  body: { flex: 1, paddingHorizontal: layout.screenPadding, paddingTop: space.xl, gap: space.xl },
+  scroll: { flex: 1 },
+  body: { paddingHorizontal: layout.screenPadding, paddingTop: space.xl, paddingBottom: space.lg, gap: space.xl },
   title: { ...text.screenTitle, color: colors.text },
   section: { gap: space.md },
   sectionLabel: { ...text.label, color: colors.textTertiary },

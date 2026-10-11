@@ -16,6 +16,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { db, migrations, useMigrations } from '@/db/client';
 import { AnimatedSplash } from '@/features/splash/AnimatedSplash';
+import { restoreLanguage, useT } from '@/i18n';
 import { colors, layout, text } from '@/ui/tokens';
 
 SplashScreen.preventAutoHideAsync();
@@ -31,8 +32,20 @@ export default function RootLayout() {
   const { success: dbReady, error: dbError } = useMigrations(db, migrations);
   // Живёт, пока жив процесс: при возврате из фона заставка не повторяется.
   const [splashDone, setSplashDone] = useState(false);
+  const t = useT();
 
-  const ready = (fontsLoaded || fontError) && dbReady;
+  // Выбранный язык читаем до снятия заставки: иначе первый кадр мелькнул бы
+  // на языке телефона и тут же перерисовался. Не прочитался — остаёмся на
+  // языке телефона, это не повод не пускать в приложение.
+  const [langReady, setLangReady] = useState(false);
+  useEffect(() => {
+    if (!dbReady) return;
+    void restoreLanguage()
+      .catch(() => {})
+      .finally(() => setLangReady(true));
+  }, [dbReady]);
+
+  const ready = (fontsLoaded || fontError) && dbReady && langReady;
 
   useEffect(() => {
     if (ready || dbError || fontError) SplashScreen.hideAsync();
@@ -43,7 +56,7 @@ export default function RootLayout() {
   if (dbError) {
     return (
       <View style={styles.fallback}>
-        <Text style={styles.fallbackTitle}>База не открылась</Text>
+        <Text style={styles.fallbackTitle}>{t.dbError.title}</Text>
         <Text style={styles.fallbackText}>{dbError.message}</Text>
       </View>
     );

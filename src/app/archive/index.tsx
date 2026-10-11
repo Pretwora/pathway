@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useArchivedGoals, useTotalsByGoal } from '@/data/hooks';
+import { useT } from '@/i18n';
 import { CompletedGoalCard } from '@/ui/components/CompletedGoalCard';
 import { HeaderButton } from '@/ui/components/HeaderButton';
 import { IconButton } from '@/ui/components/IconButton';
@@ -12,6 +13,7 @@ import { colors, layout, space, text } from '@/ui/tokens';
 export default function ArchiveScreen() {
   const { goals, loading } = useArchivedGoals();
   const totals = useTotalsByGoal();
+  const t = useT();
 
   return (
     <SafeAreaView style={styles.screen} edges={['top', 'bottom']}>
@@ -19,17 +21,17 @@ export default function ArchiveScreen() {
 
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <IconButton icon="back" label="Назад" onPress={goBack} />
-          <Text style={styles.heading}>Архив</Text>
+          <IconButton icon="back" label={t.common.back} onPress={goBack} />
+          <Text style={styles.heading}>{t.archive.title}</Text>
         </View>
         {/* Про разработчика вспоминают редко — поэтому вход отсюда, а не с главной. */}
-        <HeaderButton title="Разработчик" onPress={() => router.push('/developer')} />
+        <HeaderButton title={t.archive.developer} onPress={() => router.push('/developer')} />
       </View>
 
       {loading ? null : goals.length === 0 ? (
         <View style={styles.emptyWrap}>
-          <Text style={styles.empty}>Пока пусто.</Text>
-          <Text style={styles.emptySub}>Закрытые цели будут собираться здесь.</Text>
+          <Text style={styles.empty}>{t.archive.empty}</Text>
+          <Text style={styles.emptySub}>{t.archive.emptySub}</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
