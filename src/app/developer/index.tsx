@@ -1,6 +1,6 @@
 import Constants from 'expo-constants';
 import { Stack, router } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ContactLink } from '@/features/developer/ContactLink';
@@ -33,11 +33,15 @@ export default function DeveloperScreen() {
 
         <Text style={styles.hint}>{t.developer.hint}</Text>
 
-        <Button
-          title={t.developer.testers}
-          variant="ghost"
-          onPress={() => router.push('/developer/testers')}
-        />
+        {/* Экран зовёт в бета-тестеры — это нужно для закрытого теста Google Play.
+            В App Store приглашение в бету — повод для отказа (правило 2.2), там его нет. */}
+        {Platform.OS !== 'ios' ? (
+          <Button
+            title={t.developer.testers}
+            variant="ghost"
+            onPress={() => router.push('/developer/testers')}
+          />
+        ) : null}
       </View>
 
       <Text style={styles.footer}>Pathway · {version}</Text>
