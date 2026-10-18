@@ -26,7 +26,7 @@
     },
     "ios": {
       "bundleIdentifier": "com.sgrigoriev.pathway",
-      "buildNumber": "4",
+      "buildNumber": "5",
       "supportsTablet": false,
       "config": {
         "usesNonExemptEncryption": false

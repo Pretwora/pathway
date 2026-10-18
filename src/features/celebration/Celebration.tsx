@@ -11,6 +11,7 @@ import { ShareSheet } from '@/features/share/ShareSheet';
 import { useLang, useT } from '@/i18n';
 import { Button } from '@/ui/components/Button';
 import { Trail } from '@/ui/components/Trail';
+import { useMotion } from '@/ui/useMotion';
 import { colors, layout, space, text } from '@/ui/tokens';
 import { Confetti } from './Confetti';
 import { useCompletionSound } from './useCompletionSound';
@@ -42,6 +43,7 @@ export function Celebration({ goal, progress, onArchive }: Props) {
   const [sharing, setSharing] = useState(false);
   const t = useT();
   const lang = useLang();
+  const motion = useMotion();
 
   useEffect(() => {
     void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -60,12 +62,12 @@ export function Celebration({ goal, progress, onArchive }: Props) {
 
           <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
             <View style={styles.body}>
-              <Animated.Text entering={FadeInDown.duration(400)} style={styles.kicker}>
+              <Animated.Text entering={motion(FadeInDown.duration(400))} style={styles.kicker}>
                 {t.common.goalReached}
               </Animated.Text>
 
               <Animated.Text
-                entering={ZoomIn.duration(500).delay(150)}
+                entering={motion(ZoomIn.duration(500).delay(150))}
                 style={styles.number}
                 numberOfLines={1}
                 adjustsFontSizeToFit
@@ -73,16 +75,16 @@ export function Celebration({ goal, progress, onArchive }: Props) {
                 {progress}
               </Animated.Text>
 
-              <Animated.Text entering={FadeIn.duration(400).delay(400)} style={styles.title}>
+              <Animated.Text entering={motion(FadeIn.duration(400).delay(400))} style={styles.title}>
                 {goal.title}
               </Animated.Text>
 
-              <Animated.Text entering={FadeIn.duration(400).delay(600)} style={styles.days}>
+              <Animated.Text entering={motion(FadeIn.duration(400).delay(600))} style={styles.days}>
                 {formatDaysSpent(days, lang)}
               </Animated.Text>
 
               {extra > 0 ? (
-                <Animated.Text entering={FadeIn.duration(400).delay(800)} style={styles.extra}>
+                <Animated.Text entering={motion(FadeIn.duration(400).delay(800))} style={styles.extra}>
                   {t.common.overBy(extra)}
                 </Animated.Text>
               ) : null}
@@ -90,11 +92,11 @@ export function Celebration({ goal, progress, onArchive }: Props) {
 
             {/* Тропа пройдена целиком: финиш залит и отмечен. Выезжает
                 с нуля — последний шаг до цели видно глазами. */}
-            <Animated.View entering={FadeIn.duration(400).delay(300)} style={styles.trail}>
+            <Animated.View entering={motion(FadeIn.duration(400).delay(300))} style={styles.trail}>
               <Trail fraction={1} complete width={width - layout.screenPadding * 2} />
             </Animated.View>
 
-            <Animated.View entering={FadeInDown.duration(400).delay(1000)} style={styles.actions}>
+            <Animated.View entering={motion(FadeInDown.duration(400).delay(1000))} style={styles.actions}>
               <Button title={t.common.share} icon="share" onPress={() => setSharing(true)} />
               <Button title={t.common.toArchive} variant="ghost" onPress={onArchive} />
             </Animated.View>

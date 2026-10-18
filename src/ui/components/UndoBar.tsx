@@ -11,6 +11,7 @@ import Animated, {
 
 import { useT } from '@/i18n';
 import { colors, fonts, radius, space, text } from '@/ui/tokens';
+import { useMotion } from '@/ui/useMotion';
 import { Icon } from './Icon';
 
 type Props = {
@@ -46,6 +47,7 @@ export function UndoBar({ amount, onUndo, onDone, durationMs, resetKey }: Props)
   // 1 — полная плашка, 0 — пустая.
   const fill = useSharedValue(1);
   const t = useT();
+  const motion = useMotion();
 
   useEffect(() => {
     fill.set(1);
@@ -55,7 +57,11 @@ export function UndoBar({ amount, onUndo, onDone, durationMs, resetKey }: Props)
   const fillStyle = useAnimatedStyle(() => ({ transform: [{ scaleX: fill.get() }] }));
 
   return (
-    <Animated.View entering={FadeInDown.duration(160)} exiting={FadeOutDown.duration(160)} style={styles.bar}>
+    <Animated.View
+      entering={motion(FadeInDown.duration(160))}
+      exiting={motion(FadeOutDown.duration(160))}
+      style={styles.bar}
+    >
       {/* Первым в разметке — значит под текстом. */}
       <Animated.View style={[styles.fill, fillStyle]} pointerEvents="none" />
 
